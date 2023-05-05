@@ -1,0 +1,114 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: Datasoc Basic API
+  description: This is a basic API example
+servers:
+  - url: http://datasoc.ltd/v1/
+paths:
+  /basic/users:
+    post:
+      summary: Create a new user
+      operationId: createUser
+      tags:
+        - Create User
+      requestBody:
+        required: true
+        description: The user to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: The user has been successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: One or more of the fields in the user are missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemSummary'
+        '401':
+          description: The requester is not permitted to create a userI is not permitted to create a trial
+        '500':
+          description: Unexpected error creating this user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemSummary'
+  /basic/users/{id}:
+    get:
+      summary: Get the user specified by the id
+      operationId: getUserById
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: "The unique id for a user"
+          example: "123"
+      tags:
+        - Get User
+      responses:
+        '200':
+          description: User successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: No user found with that id
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemSummary'
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: The unique identifier of this user
+          example: 123
+        name:
+          type: string
+          description: The name of this user
+          example: "Jane"
+    FieldError:
+      type: object
+      required:
+        - field
+        - error
+      properties:
+        field:
+          type: string
+          description: The field in error
+          example: displayName
+        message:
+          type: string
+          description: The message associated with this field
+          example: Cannot be empty
+    ProblemSummary:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: An message summarising the overall error(s)
+          example: One or more of the mandatory fields is missing or invalid
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldError'
